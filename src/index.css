@@ -2,18 +2,381 @@
 
 @layer base {
   :root {
-    --color-navy: #0f2547;
-    --color-navy-light: #1a3a6b;
-    --color-cyan: #0891b2;
-    --color-cyan-light: #22d3ee;
+    --color-navy: #123b68;
+    --color-navy-light: #1f5c98;
+    --color-cyan: #1689b0;
+    --color-cyan-light: #5ec9e5;
+    --color-surface: #f5f9fd;
+    --color-lavender: #f2f6fc;
+    --primary-blue: #145da0;
+    --secondary-blue: #2b78b7;
+    --light-blue: #eaf5fb;
+    --text-dark: #132f4c;
+    --text-muted: #64778b;
+    --border: #dce8f2;
+    --shadow: 0 10px 30px rgba(24, 76, 116, 0.08);
   }
 
   body {
-    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
-    @apply bg-white text-slate-800 antialiased;
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    @apply bg-[#f5f9fd] text-slate-800 antialiased;
+    background: #f5f9fd;
+    min-height: 100vh;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  .app-shell {
+    position: relative;
+    isolation: isolate;
+    min-height: 100vh;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 45rem 30rem at 50% 25%, rgba(255, 255, 255, .98), transparent 72%),
+      radial-gradient(ellipse 32rem 24rem at -8% 6%, rgba(197, 230, 244, .48), transparent 70%),
+      radial-gradient(ellipse 30rem 25rem at 108% 18%, rgba(218, 238, 249, .52), transparent 70%),
+      linear-gradient(135deg, #f2f8fc 0%, #f8fbfe 52%, #eef7fb 100%);
+  }
+
+  .app-shell::before,
+  .app-shell::after {
+    content: '';
+    position: fixed;
+    z-index: 0;
+    pointer-events: none;
+    filter: blur(1px);
+    opacity: 0.34;
+  }
+
+  .app-shell>* {
+    position: relative;
+    z-index: 1;
+  }
+
+  .app-shell::before {
+    width: min(34rem, 48vw);
+    height: min(25rem, 42vw);
+    top: 6rem;
+    left: -7rem;
+    border-radius: 46% 54% 62% 38% / 42% 36% 64% 58%;
+    transform: rotate(-13deg);
+    background:
+      linear-gradient(145deg, rgba(120, 194, 224, .15), rgba(193, 226, 240, .03) 68%, transparent);
+  }
+
+  .app-shell::after {
+    width: min(31rem, 42vw);
+    height: min(28rem, 46vw);
+    right: -8rem;
+    bottom: 3rem;
+    border-radius: 58% 42% 38% 62% / 44% 58% 42% 56%;
+    transform: rotate(18deg);
+    background:
+      linear-gradient(35deg, rgba(190, 215, 239, .03), rgba(178, 214, 235, .2) 62%, rgba(255, 255, 255, .04));
+  }
+
+  .app-shell .min-h-screen.bg-white,
+  .app-shell .min-h-screen.bg-slate-50 {
+    background-color: transparent;
+    background-image: none;
+  }
+
+  .app-shell header {
+    background-color: rgba(255, 255, 255, 0.86);
+    backdrop-filter: blur(14px);
+    border-color: var(--border);
+  }
+
+  .bg-slate-50 {
+    background-color: #f5f9fd !important;
+  }
+
+  .bg-white {
+    background-color: #fff !important;
+  }
+
+  .border-slate-200,
+  .border-slate-100 {
+    border-color: var(--border) !important;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 3px solid rgba(43, 120, 183, .28);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 640px) {
+    .app-shell::before {
+      width: 21rem;
+      height: 15rem;
+      left: -12rem;
+      top: 11rem;
+    }
+
+    .app-shell::after {
+      width: 19rem;
+      height: 17rem;
+      right: -12rem;
+      bottom: 5rem;
+    }
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-semibold;
+  }
+
+  .sakha-illustration {
+    position: relative;
+    width: min(25rem, 42vw);
+    height: 20rem;
+    overflow: hidden;
+    isolation: isolate;
+    border-radius: 42% 58% 48% 52% / 54% 46% 54% 46%;
+    background: linear-gradient(145deg, #f7fcff 0%, #e1f2fb 100%);
+    box-shadow: 0 24px 60px rgba(20, 93, 160, 0.12);
+  }
+
+  .sakha-illustration--compact {
+    width: 8.5rem;
+    height: 7rem;
+    border-radius: 30% 70% 56% 44% / 50% 42% 58% 50%;
+    box-shadow: none;
+  }
+
+  .sakha-sun,
+  .sakha-cloud,
+  .sakha-ground,
+  .sakha-person,
+  .sakha-heart,
+  .sakha-spark {
+    position: absolute;
+  }
+
+  .sakha-sun {
+    width: 7rem;
+    height: 7rem;
+    top: -2rem;
+    right: 1.5rem;
+    border-radius: 50%;
+    background: #c9eaf6;
+    opacity: .8;
+  }
+
+  .sakha-cloud {
+    height: 1.2rem;
+    width: 5rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .9);
+  }
+
+  .sakha-cloud::before,
+  .sakha-cloud::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: inherit;
+  }
+
+  .sakha-cloud::before {
+    width: 2rem;
+    height: 2rem;
+    left: .8rem;
+    bottom: .2rem;
+  }
+
+  .sakha-cloud::after {
+    width: 1.5rem;
+    height: 1.5rem;
+    right: .8rem;
+    bottom: .1rem;
+  }
+
+  .sakha-cloud--one {
+    top: 3.2rem;
+    left: 1.8rem;
+  }
+
+  .sakha-cloud--two {
+    top: 5rem;
+    right: 1.2rem;
+    transform: scale(.7);
+    opacity: .65;
+  }
+
+  .sakha-ground {
+    left: 8%;
+    right: 8%;
+    bottom: 1.4rem;
+    height: 3rem;
+    border-radius: 50% 50% 25% 25%;
+    background: #b7dfd9;
+    opacity: .7;
+  }
+
+  .sakha-person {
+    bottom: 2.4rem;
+    width: 5.5rem;
+    height: 9.5rem;
+    animation: sakha-breathe 4s ease-in-out infinite;
+  }
+
+  .sakha-person--left {
+    left: 22%;
+  }
+
+  .sakha-person--right {
+    right: 20%;
+    animation-delay: -1.4s;
+  }
+
+  .sakha-head {
+    width: 3.4rem;
+    height: 3.4rem;
+    margin: 0 auto;
+    border-radius: 48% 52% 50% 50%;
+    background: #f2c8a9;
+    position: relative;
+    z-index: 2;
+  }
+
+  .sakha-person--right .sakha-head {
+    background: #dba987;
+  }
+
+  .sakha-face {
+    position: absolute;
+    left: .9rem;
+    top: 1.4rem;
+    width: .35rem;
+    height: .35rem;
+    border-radius: 50%;
+    background: #24465e;
+    box-shadow: 1.25rem 0 #24465e;
+  }
+
+  .sakha-face::after {
+    content: '';
+    position: absolute;
+    left: .45rem;
+    top: .55rem;
+    width: .65rem;
+    height: .3rem;
+    border-bottom: 2px solid #24465e;
+    border-radius: 0 0 1rem 1rem;
+  }
+
+  .sakha-body {
+    width: 4.8rem;
+    height: 5.7rem;
+    margin: -.2rem auto 0;
+    border-radius: 2.5rem 2.5rem 1rem 1rem;
+    background: #2377b5;
+  }
+
+  .sakha-person--right .sakha-body {
+    background: #56a9c4;
+  }
+
+  .sakha-arm {
+    position: absolute;
+    width: 3rem;
+    height: .75rem;
+    top: 4.8rem;
+    border-radius: 999px;
+    background: #f2c8a9;
+    transform-origin: left center;
+  }
+
+  .sakha-person--right .sakha-arm {
+    background: #dba987;
+  }
+
+  .sakha-arm--left {
+    left: .3rem;
+    transform: rotate(55deg);
+  }
+
+  .sakha-arm--right {
+    right: -.3rem;
+    transform: rotate(130deg);
+  }
+
+  .sakha-heart {
+    left: 47%;
+    top: 45%;
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    color: #145da0;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 6px 16px rgba(20, 93, 160, .15);
+    animation: sakha-float 3.5s ease-in-out infinite;
+  }
+
+  .sakha-spark {
+    top: 28%;
+    left: 14%;
+    color: #e5ad46;
+    animation: sakha-float 3s ease-in-out infinite reverse;
+  }
+
+  .sakha-illustration--compact .sakha-person {
+    transform: scale(.45);
+    transform-origin: bottom center;
+  }
+
+  .sakha-illustration--compact .sakha-heart {
+    transform: scale(.7);
+  }
+
+  @keyframes sakha-breathe {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-4px);
+    }
+  }
+
+  @keyframes sakha-float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+
+    .sakha-person,
+    .sakha-heart,
+    .sakha-spark {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .sakha-illustration {
+      width: 100%;
+      max-width: 22rem;
+      height: 16rem;
+      margin: 0 auto;
+    }
   }
 }

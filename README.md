@@ -1,232 +1,304 @@
-# SAFE-SENSE AI
+# SafeSense AI
 
-**AI-assisted Stress and Trauma Assessment and Victim Support Platform**
-
-> *AI-assisted assessment. Human-centered support.*
-
----
-
-## ⚠️ Important Disclaimers
-
-- **This is a prototype** built for Smart India Hackathon 2026 demonstration purposes.
-- **Not clinically validated.** SVI scores and risk bands are prototype indicators only.
-- **Not a medical or psychiatric diagnosis system.**
-- **Not a replacement** for qualified mental health professionals, counsellors, legal professionals, or emergency services.
-- **Do not deploy with real victim data** without full clinical validation, regulatory clearance, data protection compliance, and proper security hardening.
+> AI-assisted safety and wellbeing support platform  
+> Smart India Hackathon 2026 — Full Functional Application
 
 ---
 
-## Problem Statement
+## ⚠ Disclaimer
 
-*"AI-Based Real-Time Stress and Trauma Assessment Module for Victims/Complainants Accessing NHAA (14566) and Integrated Portal."*
-
-Smart India Hackathon 2026
+SafeSense AI is a **support-screening tool only**. It does not provide a medical or psychiatric diagnosis. All assessment results are prototype indicators and are not clinically validated. All interactions should be reviewed by qualified human professionals.
 
 ---
 
-## Tech Stack
+## Architecture
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React 19, TypeScript, Tailwind CSS v4 |
-| Routing | React Router DOM v7 |
-| Charts | Recharts |
-| Icons | Lucide React |
-| Build | Vite |
-| Database (production) | Supabase / PostgreSQL |
-| Auth (production) | Supabase Auth |
-| AI Service (production) | Python / FastAPI (stub provided) |
+```
+React / Vite Frontend (TypeScript)
+        ↓ HTTPS / REST
+FastAPI Backend (Python)
+        ↓
+PostgreSQL Database
+        +
+Built-in NLP / AI/ML Service (Python — no external API required)
+        +
+Web Speech API (browser-native STT + TTS)
+```
 
 ---
 
-## Quick Start
+## Quick Start (Demo Mode — No Backend Required)
+
+The frontend works fully in demo mode without the backend:
 
 ```bash
-cd safe-sense-ai
 npm install
 npm run dev
 ```
 
 Open http://localhost:5173
 
----
-
-## Demo Credentials
-
+**Demo credentials:**
 | Role | Email | Password |
 |------|-------|----------|
-| Victim / User | victim@demo.safesense | demo1234 |
-| Counsellor | counsellor@demo.safesense | demo1234 |
-| Admin | admin@demo.safesense | demo1234 |
+| User | `victim@demo.safesense` | `demo1234` |
+| Counsellor | `counsellor@demo.safesense` | `demo1234` |
+| Admin | `admin@demo.safesense` | `demo1234` |
 
-> **Note:** These are hardcoded prototype credentials. Replace with Supabase Auth in production.
-
----
-
-## Pages
-
-| Page | Route | Access |
-|------|-------|--------|
-| Landing | `/` | Public |
-| Login | `/login` | Public |
-| Support Resources | `/resources` | Public |
-| Assessment — Consent | `/assessment` | Public |
-| Assessment — Chat | `/assessment/chat` | Public |
-| Assessment — Result | `/assessment/result` | Public |
-| User Dashboard | `/dashboard` | Victim + Admin |
-| Counsellor Dashboard | `/counsellor` | Counsellor + Admin |
-| Case Detail | `/counsellor/case/:id` | Counsellor + Admin |
-| Admin Dashboard | `/admin` | Admin only |
-| Unauthorized | `/unauthorized` | Public |
+In demo mode, all data is stored in browser localStorage. Registration requires the backend.
 
 ---
 
-## Database Tables (schema.sql)
+## Full Stack Setup (with Backend + PostgreSQL)
 
-| Table | Purpose |
-|-------|---------|
-| `users` | Minimal user records — PII minimised |
-| `user_permissions` | Extended RBAC permissions |
-| `consents` | Informed consent audit trail |
-| `cases` | Case management |
-| `assessments` | Individual assessment sessions |
-| `assessment_messages` | Chat transcript (encrypted in production) |
-| `assessment_indicators` | Detected stress/vulnerability indicators |
-| `svi_results` | SVI scores and risk bands |
-| `support_resources` | Verified support resource directory |
-| `counsellors` | Counsellor profiles and availability |
-| `follow_ups` | Scheduled follow-up tracking |
-| `audit_logs` | Append-only action audit trail |
+### Prerequisites
+- Node.js 18+
+- Python 3.11+
+- PostgreSQL 15+
 
----
+### 1. Frontend
 
-## AI Assessment API Contract
-
-```
-POST /api/assessment/analyze
-
-Request:
-{
-  "text": "string",
-  "language": "en" | "hi" | "mr",
-  "voice_metadata": { "pitchVariance": number, "speechRate": number }
-}
-
-Response:
-{
-  "svi": number,           // 0–100
-  "risk_category": "LOW" | "MODERATE" | "HIGH" | "CRITICAL",
-  "indicators": [...],
-  "confidence": number,    // 0–1
-  "recommended_support": "string"
-}
+```bash
+npm install
+cp .env.example .env.local
+# Edit .env.local: set VITE_API_URL=http://localhost:8000
+npm run dev
 ```
 
-Set `VITE_AI_SERVICE_URL` environment variable to connect a real AI service.
-Without it, the prototype mock engine is used automatically.
+### 2. Backend (Python)
+
+```bash
+python setup_backend.py
+# Then:
+cp .env.example .env
+# Edit .env with your DATABASE_URL and SECRET_KEY
+```
+
+**Activate venv and start:**
+
+Windows:
+```cmd
+venv\Scripts\activate
+uvicorn backend.main:app --reload --port 8000
+```
+
+Linux/macOS:
+```bash
+source venv/bin/activate
+uvicorn backend.main:app --reload --port 8000
+```
+
+API docs: http://localhost:8000/api/docs
+
+### 3. Database
+
+```bash
+# Create database and user
+createdb safesense_db
+psql -c "CREATE USER safesense WITH PASSWORD 'your_password';"
+psql -c "GRANT ALL PRIVILEGES ON DATABASE safesense_db TO safesense;"
+```
+
+The backend auto-creates all tables on startup via SQLAlchemy.
 
 ---
 
-## SVI Risk Bands (Prototype)
+## Docker Compose (Recommended)
 
-| Band | Score | Description |
-|------|-------|-------------|
-| LOW | 0–25 | General information recommended |
-| MODERATE | 26–50 | Counsellor consultation recommended |
-| HIGH | 51–75 | Prompt human support recommended |
-| CRITICAL | 76–100 | Immediate human support recommended |
+```bash
+cp .env.example .env
+# Edit .env: set DB_PASSWORD, SECRET_KEY
 
-> **Prototype decision-support thresholds — not clinically validated.**
+docker-compose up --build
+```
 
----
-
-## Demo Mode
-
-Enable Demo Mode from the Admin Dashboard → Demo Mode tab.
-
-Demo Mode:
-- Shows a prominent banner on all pages
-- Overrides AI assessment to produce a score in the selected risk band (LOW/MODERATE/HIGH/CRITICAL)
-- Uses synthetic test data only
-- Intended for SIH presentation purposes
-
----
-
-## AI Integration Points (Remaining)
-
-1. **NLP Analysis** — Connect `src/lib/assessmentApi.ts` to a real NLP service
-2. **Speech Analysis** — Implement real voice transcription (Web Speech API or backend)
-3. **Voice Emotion Analysis** — Integrate validated speech emotion recognition (NOT included in prototype)
-4. **Clinical Validation** — Full validation of indicator patterns, scoring algorithm, and risk thresholds
-5. **Language Models** — Test and validate question sets for Hindi and Marathi
-6. **Additional Languages** — Add translations via the Language Management admin panel
-
----
-
-## Security Considerations
-
-- [ ] Replace localStorage auth with Supabase Auth sessions
-- [ ] Enable Row-Level Security (RLS) on all Supabase tables
-- [ ] Implement field-level encryption for `assessment_messages`
-- [ ] Add HTTPS enforcement
-- [ ] Conduct DPIA (Data Protection Impact Assessment)
-- [ ] Implement data retention and deletion policies
-- [ ] Add rate limiting on assessment endpoints
-- [ ] Regular security audits
-- [ ] Verify all support resource contact information before publishing
-- [ ] Implement proper session timeout
-- [ ] Add CSRF protection for form submissions
+Services:
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:8000
+- PostgreSQL: localhost:5432
 
 ---
 
 ## Environment Variables
 
-```env
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-VITE_AI_SERVICE_URL=https://your-ai-service.example.com  # Optional
+See `.env.example` for all variables with descriptions.
+
+**Required for full stack:**
+```
+VITE_API_URL=http://localhost:8000
+DATABASE_URL=postgresql://safesense:password@localhost:5432/safesense_db
+SECRET_KEY=your-long-random-secret-key
 ```
 
-Copy `.env.example` to `.env.local` and fill in values.
+**Optional (enhanced features):**
+```
+OPENAI_API_KEY=sk-...          # Enhanced NLP responses
+SPEECH_API_KEY=...             # Cloud STT (browser Web Speech API used by default)
+```
+
+---
+
+## Features
+
+### ✅ Fully Functional
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| AI Chat (real-time) | ✅ | Context-aware safety-first responses |
+| Voice Assistant (STT + TTS) | ✅ | Web Speech API (Chrome/Edge) |
+| Assessment with voice input | ✅ | Real microphone → transcript → analysis |
+| NLP stress indicator detection | ✅ | Keyword + TextBlob sentiment analysis |
+| Emotion signal extraction | ✅ | Model-derived signals (non-diagnostic) |
+| SVI calculation | ✅ | Transparent weighted scoring engine |
+| Risk classification | ✅ | LOW/MODERATE/HIGH/CRITICAL |
+| Personalized recommendations | ✅ | Based on detected indicators |
+| SVI scoring breakdown | ✅ | Full transparent audit trail |
+| Daily check-in | ✅ | Prevents duplicate daily entries |
+| Progress tracking (real data) | ✅ | SVI trend + mood trend charts |
+| Support request / escalation | ✅ | Persisted to DB or localStorage |
+| Follow-up scheduling | ✅ | Stored and trackable |
+| User dashboard (real data) | ✅ | Loads from API with localStorage fallback |
+| Registration | ✅ | Requires backend (bcrypt hashed passwords) |
+| Login / Logout | ✅ | JWT auth + demo credentials without backend |
+| Role-based access control | ✅ | user / moderator / admin |
+| Moderator dashboard | ✅ | Cases, alerts, status updates |
+| Admin dashboard | ✅ | Users, audit logs, stats |
+| Audit logging | ✅ | All sensitive actions logged to DB |
+| Safety alert creation | ✅ | Auto-created for HIGH/CRITICAL assessments |
+| Emergency escalation (CRITICAL) | ✅ | Auto support request created |
+| Support resources page | ✅ | Filterable by category |
+| Mobile responsive | ✅ | Tailwind responsive design |
+| TypeScript build | ✅ | Zero errors |
+| Docker containerization | ✅ | `docker-compose up` |
+
+### ⚙ Requires External Setup
+
+| Feature | What's needed |
+|---------|---------------|
+| Real PostgreSQL persistence | DATABASE_URL in .env |
+| User registration | Backend running |
+| Backend API features | `uvicorn backend.main:app` |
+| Enhanced NLP via LLM | OPENAI_API_KEY (optional) |
+| Cloud STT | SPEECH_API_KEY (browser API is default) |
+
+---
+
+## AI/ML Architecture
+
+The AI/ML service is implemented in [`backend/ai_service.py`](backend/ai_service.py).
+
+### Pipeline
+
+```
+User text input
+      ↓
+Text cleaning + tokenization (NLTK)
+      ↓
+Stress/trauma indicator detection (keyword patterns)
+      ↓
+Sentiment analysis (TextBlob polarity + subjectivity)
+      ↓
+Emotion signal derivation (model-derived, non-diagnostic)
+      ↓
+Voice feature analysis (if voice metadata available)
+      ↓
+Protective factor detection
+      ↓
+SVI calculation (transparent weighted scoring)
+      ↓
+Risk classification (LOW / MODERATE / HIGH / CRITICAL)
+      ↓
+Personalized recommendation generation
+```
+
+### Scoring Model (baseline-v1.0)
+
+```
+SVI = text_indicator_score (0–70)
+    + sentiment_penalty (0–10)
+    - protective_factor_reduction (0–10)
+    + voice_stress_contribution (0–15)
+    + structured_data_contribution (0–15)
+```
+
+All scoring weights are documented in the source code. The architecture supports plugging in a trained ML model.
+
+---
+
+## Security
+
+- Passwords: bcrypt hashed (12 rounds)
+- Auth: JWT tokens (HS256, configurable expiry)
+- RBAC: enforced on all backend endpoints
+- CORS: configurable per environment
+- Security headers: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection
+- Rate limiting: via slowapi
+- Audit logs: all sensitive actions recorded
+- No secrets in frontend code
+- No API keys in git (use .env files)
 
 ---
 
 ## Project Structure
 
 ```
-src/
-├── components/
-│   ├── Layout.tsx          # Navbar, PageHeader, StatCard
-│   ├── Logo.tsx            # Brand logo component
-│   ├── ProtectedRoute.tsx  # RBAC route guard
-│   ├── SVIMeter.tsx        # SVI score visualisation
-│   └── ui.tsx              # Shared UI primitives
-├── context/
-│   └── AuthContext.tsx     # Auth + demo mode state
-├── lib/
-│   ├── assessmentApi.ts    # API stub (connects real/mock AI)
-│   ├── mockAssessment.ts   # Prototype mock AI engine
-│   ├── mockAuth.ts         # Demo authentication
-│   └── mockData.ts         # Placeholder support resources
-├── pages/
-│   ├── LandingPage.tsx
-│   ├── LoginPage.tsx
-│   ├── AssessmentOnboardingPage.tsx
-│   ├── AssessmentChatPage.tsx
-│   ├── AssessmentResultPage.tsx
-│   ├── ResourcesPage.tsx
-│   ├── UserDashboardPage.tsx
-│   ├── CounsellorDashboardPage.tsx
-│   ├── CaseDetailPage.tsx
-│   └── AdminDashboardPage.tsx
-├── types/
-│   └── index.ts            # All TypeScript types
-├── App.tsx                 # Router + route definitions
-└── main.tsx
-schema.sql                  # PostgreSQL/Supabase schema
-.env.example                # Environment variable template
+safe-sense-ai/
+├── src/                        # React/TypeScript frontend
+│   ├── pages/                  # All page components
+│   ├── components/             # Shared UI components
+│   ├── context/                # Auth context
+│   └── lib/
+│       ├── apiClient.ts        # Backend API calls
+│       ├── speechService.ts    # Web Speech API (STT + TTS)
+│       ├── localDb.ts          # localStorage persistence
+│       └── mockAssessment.ts   # Local NLP fallback
+├── backend/                    # Python FastAPI backend
+│   ├── main.py                 # FastAPI app entry point
+│   ├── models.py               # SQLAlchemy models
+│   ├── auth.py                 # JWT + bcrypt auth
+│   ├── ai_service.py           # NLP + SVI + ML pipeline
+│   ├── config.py               # Settings (pydantic-settings)
+│   ├── database.py             # DB session
+│   └── routers/                # API route handlers
+│       ├── auth.py
+│       ├── assessments.py
+│       ├── chat.py
+│       ├── checkins.py
+│       ├── progress.py
+│       ├── support.py
+│       ├── moderator.py
+│       ├── resources.py
+│       └── admin.py
+├── Dockerfile.backend          # Backend Docker image
+├── docker-compose.yml          # Full stack compose
+├── setup_backend.py            # One-command backend setup
+├── .env.example                # Environment variable template
+└── schema.sql                  # Reference PostgreSQL schema
 ```
 
 ---
 
-*SAFE-SENSE AI — Smart India Hackathon 2026 Prototype*
+## Running the Complete Application
+
+### Option A: Frontend only (demo mode)
+```bash
+npm run dev
+```
+
+### Option B: Full stack
+Terminal 1:
+```bash
+# Start backend
+source venv/bin/activate   # or: venv\Scripts\activate (Windows)
+uvicorn backend.main:app --reload --port 8000
+```
+Terminal 2:
+```bash
+# Start frontend
+npm run dev
+```
+
+### Option C: Docker
+```bash
+docker-compose up --build
+```

@@ -1,16 +1,34 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { LogOut, User, Menu, X } from 'lucide-react';
+import { LogOut, User, Menu, X, Globe } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../context/AuthContext';
-import { Badge } from './ui';
+import { useLanguage } from '../context/LanguageContext';
+import type { Language } from '../types';
 import clsx from 'clsx';
 
+const LANG_LABELS: Record<Language, string> = { en: 'EN', hi: 'हि', mr: 'म' };
+const LANG_FULL: Record<Language, string> = { en: 'English', hi: 'हिन्दी', mr: 'मराठी' };
+
 export function Navbar() {
-  const { user, logout, demoMode } = useAuth();
+  const { user, logout } = useAuth();
+  const { language, setLanguage } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [langOpen, setLangOpen] = React.useState(false);
+  const langRef = React.useRef<HTMLDivElement>(null);
+
+  // Close language picker when clicking outside
+  React.useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (langRef.current && !langRef.current.contains(e.target as Node)) {
+        setLangOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -21,17 +39,11 @@ export function Navbar() {
     user?.role === 'admin'
       ? '/admin'
       : user?.role === 'counsellor'
-      ? '/counsellor'
-      : '/dashboard';
+        ? '/counsellor'
+        : '/dashboard';
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
-      {demoMode.active && (
-        <div className="bg-amber-400 text-amber-900 text-xs font-semibold text-center py-1.5 px-4">
-          ⚠ DEMO MODE — Uses synthetic test data. Not for real case use.&nbsp;
-          <span className="bg-amber-600 text-white rounded px-1.5 py-0.5">{demoMode.scenario}</span>
-        </div>
-      )}
+    <header className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-[0_2px_14px_rgba(24,76,116,0.06)]">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="flex-shrink-0">
@@ -40,23 +52,60 @@ export function Navbar() {
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-6">
-            <NavLink to="/resources" label="Resources" current={location.pathname} />
+            <NavLink to="/chat" label="Chat" current={location.pathname} />
             {user && <NavLink to={dashboardLink} label="Dashboard" current={location.pathname} />}
+            {user && user.role === 'victim' && <NavLink to="/profile" label="Profile" current={location.pathname} />}
+            {user && user.role === 'victim' && (
+              <>
+                <NavLink to="/checkin" label="Check-In" current={location.pathname} />
+                <NavLink to="/progress" label="Progress" current={location.pathname} />
+              </>
+            )}
+            <NavLink to="/privacy" label="Privacy" current={location.pathname} />
           </div>
 
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2">
+            {/* Language picker */}
+            <div className="relative" ref={langRef}>
+              <button
+                onClick={() => setLangOpen(v => !v)}
+                className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 text-slate-500 hover:text-[#0f2547] transition-colors"
+                title="Language / भाषा / भाषा"
+              >
+                <Globe size={13} />
+                {LANG_LABELS[language]}
+              </button>
+              {langOpen && (
+                <div className="absolute right-0 top-9 bg-white border border-slate-200 rounded-xl shadow-lg z-30 py-1 min-w-[130px]">
+                  {(['en', 'hi', 'mr'] as Language[]).map(l => (
+                    <button
+                      key={l}
+                      onClick={() => { setLanguage(l); setLangOpen(false); }}
+                      className={clsx(
+                        'w-full text-left px-4 py-2 text-sm hover:bg-slate-50 transition-colors',
+                        l === language ? 'text-[#0f2547] font-semibold' : 'text-slate-600'
+                      )}
+                    >
+                      {LANG_FULL[l]}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {user ? (
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <User size={15} />
-                  <span className="font-medium">{user.name}</span>
-                  <Badge variant="info">{user.role}</Badge>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 text-sm text-slate-600">
+                  <div className="w-7 h-7 bg-[#0f2547] rounded-full flex items-center justify-center">
+                    <User size={13} className="text-cyan-300" />
+                  </div>
+                  <span className="font-medium text-sm">{user.name.split(' ')[0]}</span>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-[#0f2547] transition-colors"
+                  className="flex items-center gap-1 text-xs text-slate-500 hover:text-red-500 transition-colors px-2 py-1.5 rounded-lg hover:bg-red-50"
                 >
-                  <LogOut size={15} />
+                  <LogOut size={13} />
                   Sign out
                 </button>
               </div>
@@ -70,9 +119,9 @@ export function Navbar() {
                 </Link>
                 <Link
                   to="/assessment"
-                  className="bg-[#0f2547] text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-[#1a3a6b] transition-colors"
+                  className="bg-[#145da0] text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-[#104d87] transition-colors shadow-sm"
                 >
-                  Start Assessment
+                  Get Started
                 </Link>
               </div>
             )}
@@ -89,26 +138,53 @@ export function Navbar() {
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div className="md:hidden border-t border-slate-100 py-3 space-y-2">
-            <MobileLink to="/resources" label="Resources" onClick={() => setMobileOpen(false)} />
+          <div className="md:hidden border-t border-slate-100 py-3 space-y-1">
+            <MobileLink to="/chat" label="Chat" onClick={() => setMobileOpen(false)} />
             {user && (
-              <MobileLink
-                to={dashboardLink}
-                label="Dashboard"
-                onClick={() => setMobileOpen(false)}
-              />
+              <MobileLink to={dashboardLink} label="Dashboard" onClick={() => setMobileOpen(false)} />
             )}
+            {user && user.role === 'victim' && (
+              <MobileLink to="/profile" label="Profile" onClick={() => setMobileOpen(false)} />
+            )}
+            {user && user.role === 'victim' && (
+              <>
+                <MobileLink to="/checkin" label="Daily Check-In" onClick={() => setMobileOpen(false)} />
+                <MobileLink to="/progress" label="Progress" onClick={() => setMobileOpen(false)} />
+                <MobileLink to="/support" label="Get Support" onClick={() => setMobileOpen(false)} />
+              </>
+            )}
+            <MobileLink to="/privacy" label="Privacy & Security" onClick={() => setMobileOpen(false)} />
+
+            {/* Mobile language */}
+            <div className="px-3 py-2">
+              <p className="text-xs text-slate-400 mb-1">Language</p>
+              <div className="flex gap-2">
+                {(['en', 'hi', 'mr'] as Language[]).map(l => (
+                  <button
+                    key={l}
+                    onClick={() => { setLanguage(l); setMobileOpen(false); }}
+                    className={clsx(
+                      'px-3 py-1 rounded-lg text-sm border transition-colors',
+                      l === language ? 'bg-[#0f2547] text-white border-[#0f2547]' : 'border-slate-200 text-slate-600 hover:border-slate-300'
+                    )}
+                  >
+                    {LANG_FULL[l]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {user ? (
               <button
                 onClick={() => { handleLogout(); setMobileOpen(false); }}
-                className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg"
+                className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-2"
               >
-                Sign out
+                <LogOut size={14} /> Sign out
               </button>
             ) : (
               <>
                 <MobileLink to="/login" label="Sign in" onClick={() => setMobileOpen(false)} />
-                <MobileLink to="/assessment" label="Start Assessment" onClick={() => setMobileOpen(false)} />
+                <MobileLink to="/assessment" label="Get Started" onClick={() => setMobileOpen(false)} />
               </>
             )}
           </div>
@@ -167,9 +243,9 @@ export function PageHeader({ title, subtitle, badge, actions, back }: PageHeader
           </button>
         )}
         <div className="flex items-center gap-3">
-          <h1 className="text-xl font-bold text-[#0f2547]">{title}</h1>
+          <h1 className="text-xl font-bold text-[#123b68] tracking-tight">{title}</h1>
           {badge && (
-            <span className="bg-cyan-100 text-cyan-700 text-xs font-medium px-2 py-0.5 rounded-full">
+            <span className="bg-[#e7f4fb] text-[#14648e] text-xs font-semibold px-2.5 py-1 rounded-full border border-[#c9e5f3]">
               {badge}
             </span>
           )}

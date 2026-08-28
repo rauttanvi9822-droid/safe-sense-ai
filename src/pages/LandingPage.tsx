@@ -1,103 +1,116 @@
 import { Link } from 'react-router-dom';
-import {
-  Shield, Users, Lock, Heart, Info,
-  MessageCircle, TrendingUp, UserCheck, ArrowRight
-} from 'lucide-react';
+import { Shield, Lock, Heart, MessageCircle, TrendingUp, Mic, Gauge } from 'lucide-react';
 import { Navbar } from '../components/Layout';
 import { Logo } from '../components/Logo';
-import { Button, Alert } from '../components/ui';
+import { Button } from '../components/ui';
+import { useAuth } from '../context/AuthContext';
+import { SakhaIllustration } from '../components/SakhaIllustration';
 
 export default function LandingPage() {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-[#0f2547] via-[#1a3a6b] to-[#0891b2] text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm mb-6">
-              <Shield size={14} className="text-cyan-300" />
-              <span className="text-cyan-100">Smart India Hackathon 2026 — Prototype</span>
+      <section className="relative overflow-hidden bg-[#eef7fc] text-[#123b68] border-b border-[#d9ebf5]">
+        <div className="absolute -right-20 -top-24 h-80 w-80 rounded-full border-[34px] border-[#d7edf7] opacity-70" aria-hidden="true" />
+        <div className="absolute right-24 bottom-[-5rem] h-52 w-52 rounded-full bg-[#dff2fa] opacity-70" aria-hidden="true" />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 relative grid lg:grid-cols-[1.05fr_.95fr] items-center gap-12">
+          <div className="max-w-2xl">
+            {user && <p className="text-sm font-semibold text-[#145da0] mb-3">Welcome back, {user.name.split(' ')[0]}.</p>}
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#c9e5f3] bg-white/80 px-3 py-1.5 text-xs font-semibold text-[#14648e] mb-6">
+              <Shield size={14} /> Private, human-centred wellbeing support
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
-              Early identification.
+            <p className="text-sm font-semibold text-[#1689b0] mb-3">Meet Sakha, your AI Dost</p>
+            <h1 className="text-4xl md:text-6xl font-bold leading-[1.08] tracking-tight mb-5">
+              Sometimes you need
               <br />
-              <span className="text-cyan-300">Better support.</span>
-              <br />
-              Human-centered care.
+              someone who <span className="text-[#1689b0]">listens.</span>
             </h1>
-            <p className="text-lg text-blue-100 mb-8 max-w-2xl leading-relaxed">
-              SAFE-SENSE AI provides AI-assisted assessment of stress and vulnerability during
-              support interactions and helps connect users with appropriate human assistance.
+            <p className="text-lg text-[#4f6d85] mb-8 leading-relaxed max-w-xl">
+              Sakha listens, helps you track your wellbeing over time,
+              and connects you with the right support when you need it.
+              No judgment. No pressure.
             </p>
-            <Alert type="warning" className="mb-8 bg-white/10 border-white/20 text-white text-sm">
-              <strong>Important:</strong> SAFE-SENSE AI provides screening and support guidance
-              only. It does not provide a medical or psychiatric diagnosis and is not a replacement
-              for a qualified professional.
-            </Alert>
             <div className="flex flex-col sm:flex-row gap-3">
-              <Link to="/assessment">
-                <Button size="lg" variant="secondary" className="gap-2">
-                  Start Assessment <ArrowRight size={18} />
-                </Button>
-              </Link>
-              <a href="#how-it-works">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-white/40 text-white hover:bg-white/10 hover:text-white"
-                >
-                  Learn How It Works
-                </Button>
-              </a>
+              {user ? (
+                <Link to="/dashboard">
+                  <Button size="lg" variant="primary">
+                    Start Today's Check-in
+                  </Button>
+                </Link>
+              ) : (
+                <>
+                  <Link to="/assessment">
+                    <Button size="lg" variant="primary">
+                      Check My Wellbeing
+                    </Button>
+                  </Link>
+                  <Link to="/chat">
+                    <Button size="lg" variant="outline">
+                      Talk to Sakha
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
+          </div>
+          <div className="hidden sm:flex justify-center lg:justify-end">
+            <SakhaIllustration />
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section id="how-it-works" className="py-20 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Features */}
+      <section className="py-20 bg-white">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-[#0f2547]">How It Works</h2>
-            <p className="text-slate-500 mt-2 max-w-xl mx-auto">
-              A simple, private process designed with your comfort in mind.
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#1689b0] mb-2">Support that meets you where you are</p>
+            <h2 className="text-2xl font-bold text-[#123b68]">What SafeSense AI does</h2>
+            <p className="text-slate-500 mt-2 max-w-xl mx-auto text-sm">
+              Everything in one place — from a quick check-in to deeper conversations.
             </p>
           </div>
-          <div className="grid md:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
             {[
               {
-                step: '01',
-                icon: <Lock size={24} />,
-                title: 'Consent & Privacy',
-                desc: 'Review how your information is used and give your informed consent before any assessment.',
-              },
-              {
-                step: '02',
                 icon: <MessageCircle size={24} />,
-                title: 'Structured Conversation',
-                desc: 'Respond to supportive questions at your own pace via text or voice interface.',
+                title: 'Conversational Support',
+                desc: 'Talk through whatever is on your mind. SafeSense listens and responds like a calm, supportive companion — not a chatbot.',
               },
               {
-                step: '03',
                 icon: <TrendingUp size={24} />,
-                title: 'AI-Assisted Analysis',
-                desc: 'A prototype AI engine identifies possible indicators of stress and vulnerability.',
+                title: 'Track Your Wellbeing',
+                desc: 'Daily check-ins and progress charts help you see patterns in your mood, stress, energy, and sleep over time.',
               },
               {
-                step: '04',
-                icon: <UserCheck size={24} />,
-                title: 'Human Support',
-                desc: 'Results are reviewed by trained professionals who provide appropriate support.',
+                icon: <Gauge size={24} />,
+                title: 'Stress Scale',
+                desc: 'Quickly rate your stress level 0–10 and get a personalized response that meets you where you are.',
               },
-            ].map((item) => (
-              <div key={item.step} className="bg-white rounded-xl border border-slate-200 p-6">
-                <div className="text-xs font-bold text-cyan-600 mb-3">{item.step}</div>
-                <div className="w-10 h-10 bg-[#0f2547] rounded-lg flex items-center justify-center text-cyan-300 mb-4">
+              {
+                icon: <Mic size={24} />,
+                title: 'Voice-enabled chat',
+                desc: 'Speak naturally or type to Sakha. Your conversation stays in one calm, private chat.',
+              },
+              {
+                icon: <Shield size={24} />,
+                title: 'Stress Assessment',
+                desc: 'A structured assessment helps identify possible stress indicators and suggests appropriate next steps.',
+              },
+              {
+                icon: <Heart size={24} />,
+                title: 'Human Support',
+                desc: 'When you need more than an AI, SafeSense helps you connect with real support professionals.',
+              },
+            ].map(item => (
+              <div key={item.title} className="p-6 rounded-xl border border-slate-100 bg-white hover:border-[#b9dced] hover:shadow-[0_12px_28px_rgba(24,76,116,0.08)] transition-all">
+                <div className="w-10 h-10 bg-[#e7f4fb] rounded-lg flex items-center justify-center text-[#145da0] mb-4">
                   {item.icon}
                 </div>
-                <h3 className="font-semibold text-[#0f2547] mb-2">{item.title}</h3>
+                <h3 className="font-semibold text-[#123b68] mb-2">{item.title}</h3>
                 <p className="text-sm text-slate-500 leading-relaxed">{item.desc}</p>
               </div>
             ))}
@@ -105,141 +118,65 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Privacy & Safety */}
-      <section id="privacy" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+      {/* Privacy */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-10 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 bg-cyan-50 text-cyan-700 rounded-full px-3 py-1 text-sm mb-4">
-                <Lock size={14} />
-                Privacy & Safety
+              <div className="flex items-center gap-2 text-cyan-600 text-sm mb-3">
+                <Lock size={15} />
+                <span>Privacy first</span>
               </div>
-              <h2 className="text-3xl font-bold text-[#0f2547] mb-4">
-                Your safety is the priority
+              <h2 className="text-2xl font-bold text-[#0f2547] mb-3">
+                Your data belongs to you
               </h2>
-              <p className="text-slate-600 mb-6 leading-relaxed">
-                SAFE-SENSE AI is designed with data minimization principles. You are always in
-                control of your interaction. You can exit at any point, and no unnecessary personal
-                information is required.
+              <p className="text-slate-600 text-sm leading-relaxed mb-4">
+                Your conversations and check-ins are private to your account.
+                We don't sell your data or share it for advertising.
+                You can delete your data at any time.
               </p>
-              <ul className="space-y-3">
-                {[
-                  'Consent required before any assessment',
-                  'You can exit at any time',
-                  'Minimum necessary information only',
-                  'Human professional review',
-                  'Audit logs for accountability',
-                  'Role-based access — only authorized staff can view case data',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm text-slate-600">
-                    <div className="w-5 h-5 bg-cyan-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <svg className="w-3 h-3 text-cyan-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    {item}
-                  </li>
-                ))}
-              </ul>
+              <Link to="/privacy" className="text-sm text-cyan-600 hover:underline">
+                Read our full privacy notice →
+              </Link>
             </div>
-            <div className="bg-slate-50 rounded-2xl p-8 space-y-4">
-              <Alert type="disclaimer">
-                <strong>Privacy Notice:</strong> Information submitted through SAFE-SENSE AI may
-                be stored and reviewed by authorized support professionals. This platform is a
-                prototype system. In production, full data handling policies governed by applicable
-                law will apply.
-              </Alert>
-              <Alert type="info">
-                <strong>AI Transparency:</strong> The assessment engine is a prototype and uses
-                pattern matching — not a clinically validated AI. All assessments are reviewed by
-                human professionals.
-              </Alert>
-              <Alert type="warning">
-                <strong>Not a diagnosis:</strong> No psychiatric or medical diagnosis is made
-                by this platform.
-              </Alert>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Human Support */}
-      <section id="support" className="py-20 bg-[#0f2547] text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <Heart size={40} className="mx-auto text-cyan-300 mb-4" />
-          <h2 className="text-3xl font-bold mb-4">Human Support, Always</h2>
-          <p className="text-blue-200 max-w-2xl mx-auto mb-8 leading-relaxed">
-            AI assists in identifying possible indicators — but every assessment is reviewed by a
-            trained support professional. You will never be left with only an automated response.
-          </p>
-          <div className="grid md:grid-cols-3 gap-6 text-left">
-            {[
-              { icon: <Users size={20} />, title: 'Trained Counsellors', desc: 'All high-risk assessments are reviewed by qualified support professionals.' },
-              { icon: <Shield size={20} />, title: 'Victim-Centered', desc: 'Support pathways are designed around your needs, not just assessment scores.' },
-              { icon: <Heart size={20} />, title: 'Ongoing Support', desc: 'Follow-up assessments and progress tracking to monitor wellbeing over time.' },
-            ].map((item) => (
-              <div key={item.title} className="bg-white/10 border border-white/20 rounded-xl p-6">
-                <div className="w-9 h-9 bg-cyan-500/20 rounded-lg flex items-center justify-center text-cyan-300 mb-3">
-                  {item.icon}
+            <div className="space-y-3">
+              {[
+                'Each user account is completely separate',
+                'Your conversations stay private',
+                'You can clear your data whenever you want',
+                'SafeSense is an AI companion, not a medical service',
+                'Human professionals available when needed',
+              ].map(item => (
+                <div key={item} className="flex items-start gap-3 text-sm text-slate-600">
+                  <div className="w-5 h-5 bg-cyan-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg className="w-3 h-3 text-cyan-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  {item}
                 </div>
-                <h3 className="font-semibold mb-2">{item.title}</h3>
-                <p className="text-sm text-blue-200 leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
-
-      {/* About */}
-      <section id="about" className="py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 bg-slate-100 text-slate-600 rounded-full px-3 py-1 text-sm mb-4">
-            <Info size={14} />
-            About the Platform
-          </div>
-          <h2 className="text-3xl font-bold text-[#0f2547] mb-4">About SAFE-SENSE AI</h2>
-          <p className="text-slate-600 leading-relaxed mb-6">
-            SAFE-SENSE AI is developed as a prototype for Smart India Hackathon 2026, responding to
-            the problem statement:{' '}
-            <em>
-              "AI-Based Real-Time Stress and Trauma Assessment Module for Victims/Complainants
-              Accessing NHAA (14566) and Integrated Portal."
-            </em>
-          </p>
-          <p className="text-slate-600 leading-relaxed mb-8">
-            It is designed to assist — not replace — qualified mental health, legal, and support
-            professionals. The AI component provides indicative screening only. All results are
-            meant to inform and support human decision-making, not to automate it.
-          </p>
-          <Alert type="disclaimer" className="text-left">
-            <strong>Prototype Status:</strong> This is a demonstration system built for hackathon
-            presentation. It has not been clinically validated. It must not be used as a real
-            diagnostic or assessment tool without full clinical validation, regulatory clearance,
-            and proper data protection compliance.
-          </Alert>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-slate-50 border-t border-slate-200">
+      <section className="py-16 bg-[#123b68] text-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold text-[#0f2547] mb-3">
-            Ready to begin?
-          </h2>
-          <p className="text-slate-500 mb-6">
-            Start an assessment or sign in to access your dashboard.
+          <h2 className="text-2xl font-bold mb-3">Ready to get started?</h2>
+          <p className="text-blue-200 mb-6 text-sm">
+            Create a free account or just try the chat — no sign-up required.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link to="/assessment">
-              <Button size="lg">Start Assessment</Button>
+            <Link to={user ? '/dashboard' : '/login'}>
+              <Button size="lg" variant="secondary">
+                {user ? 'Go to Dashboard' : 'Create Account'}
+              </Button>
             </Link>
-            <Link to="/login">
+            <Link to="/chat">
               <Button size="lg" variant="outline">
-                Professional Sign In
+                Try the Chat First
               </Button>
             </Link>
           </div>
@@ -247,18 +184,17 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#0f2547] text-blue-200 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <footer className="bg-[#0d3155] text-blue-200 py-6 border-t border-white/10">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <Logo size="sm" variant="light" />
             <div className="text-xs text-blue-300 text-center">
-              SAFE-SENSE AI — Smart India Hackathon 2026 Prototype
-              <br />
-              Not a clinically validated system. Not for real-world use without proper validation.
+              SafeSense AI — supportive guidance, not a medical service
             </div>
             <nav className="flex gap-4 text-sm">
-              <Link to="/resources" className="hover:text-white transition-colors">Resources</Link>
-              <Link to="/login" className="hover:text-white transition-colors">Sign In</Link>
+              <Link to="/privacy" className="hover:text-white transition-colors text-xs">Privacy</Link>
+              <Link to="/chat" className="hover:text-white transition-colors text-xs">Chat</Link>
+              <Link to="/login" className="hover:text-white transition-colors text-xs">Sign In</Link>
             </nav>
           </div>
         </div>

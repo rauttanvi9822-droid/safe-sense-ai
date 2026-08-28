@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Users, Settings, Globe, BarChart3, FileText, Shield,
   Plus, Trash2, Edit, Check, AlertTriangle, Database,
@@ -12,6 +12,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
 import clsx from 'clsx';
+import { apiGetAdminStats } from '../lib/apiClient';
 
 type AdminTab = 'overview' | 'users' | 'resources' | 'languages' | 'demo' | 'audit' | 'config';
 
@@ -23,21 +24,6 @@ const TAB_ITEMS: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
   { id: 'demo', label: 'Demo Mode', icon: <FlaskConical size={16} /> },
   { id: 'audit', label: 'Audit Logs', icon: <FileText size={16} /> },
   { id: 'config', label: 'Configuration', icon: <Settings size={16} /> },
-];
-
-const ANALYTICS_DATA = [
-  { month: 'Oct', assessments: 12, critical: 2, high: 4 },
-  { month: 'Nov', assessments: 19, critical: 3, high: 7 },
-  { month: 'Dec', assessments: 15, critical: 1, high: 5 },
-  { month: 'Jan', assessments: 24, critical: 4, high: 9 },
-  { month: 'Feb', assessments: 18, critical: 2, high: 6 },
-];
-
-const RISK_PIE = [
-  { name: 'LOW', value: 22, color: '#22c55e' },
-  { name: 'MODERATE', value: 31, color: '#eab308' },
-  { name: 'HIGH', value: 28, color: '#f97316' },
-  { name: 'CRITICAL', value: 12, color: '#ef4444' },
 ];
 
 const MOCK_USERS = [
@@ -118,14 +104,30 @@ export default function AdminDashboardPage() {
 }
 
 function OverviewTab() {
+  const [stats, setStats] = useState<any>(null);
+
+  useEffect(() => {
+    apiGetAdminStats().then(setStats).catch(() => setStats(null));
+  }, []);
+
+  const riskData = stats ? Object.entries(stats.risk_distribution ?? {}).map(([name, value]) => ({
+    name, value: Number(value), color: name === 'LOW' ? '#22c55e' : name === 'MODERATE' ? '#eab308' : name === 'HIGH' ? '#f97316' : '#ef4444',
+  })) : [];
+  const aggregateData = [{
+    period: 'All time',
+    assessments: stats?.total_assessments ?? 0,
+    high: stats?.risk_distribution?.HIGH ?? 0,
+    critical: stats?.risk_distribution?.CRITICAL ?? 0,
+  }];
+
   return (
     <div className="space-y-6">
       <PrototypeDisclaimer />
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label="Total Cases" value={93} icon={<Database size={18} />} color="bg-blue-50 text-blue-600" />
-        <StatCard label="Active Users" value={14} icon={<Users size={18} />} color="bg-green-50 text-green-600" />
-        <StatCard label="This Month" value={18} icon={<Activity size={18} />} color="bg-cyan-50 text-cyan-600" />
-        <StatCard label="Critical (Open)" value={2} icon={<AlertTriangle size={18} />} color="bg-red-50 text-red-600" />
+        <StatCard label="Completed Assessments" value={stats?.total_assessments ?? '—'} icon={<Database size={18} />} color="bg-blue-50 text-blue-600" />
+        <StatCard label="Users" value={stats?.total_users ?? '—'} icon={<Users size={18} />} color="bg-green-50 text-green-600" />
+        <StatCard label="Daily Check-ins" value={stats?.total_checkins ?? '—'} icon={<Activity size={18} />} color="bg-cyan-50 text-cyan-600" />
+        <StatCard label="Average Score" value={stats?.average_score ?? '—'} icon={<AlertTriangle size={18} />} color="bg-red-50 text-red-600" />
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
@@ -134,9 +136,9 @@ function OverviewTab() {
           <p className="text-xs text-slate-400 italic mb-4">Anonymized aggregate data</p>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={ANALYTICS_DATA}>
+              <BarChart data={aggregateData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                <XAxis dataKey="period" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 11 }} />
                 <Tooltip />
                 <Bar dataKey="assessments" fill="#0891b2" radius={[3, 3, 0, 0]} name="Total" />
@@ -153,8 +155,8 @@ function OverviewTab() {
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={RISK_PIE} cx="50%" cy="50%" innerRadius={45} outerRadius={70} paddingAngle={3} dataKey="value">
-                  {RISK_PIE.map((entry) => (
+                <Pie data={riskData} cx="50%" cy="50%" innerRadius={45} outerRadius={70} paddingAngle={3} dataKey="value">
+                  {riskData.map((entry) => (
                     <Cell key={entry.name} fill={entry.color} />
                   ))}
                 </Pie>
@@ -163,7 +165,7 @@ function OverviewTab() {
             </ResponsiveContainer>
           </div>
           <div className="flex flex-wrap gap-2 justify-center">
-            {RISK_PIE.map((e) => (
+            {riskData.map((e) => (
               <span key={e.name} className="flex items-center gap-1 text-xs text-slate-600">
                 <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: e.color }} />
                 {e.name}: {e.value}

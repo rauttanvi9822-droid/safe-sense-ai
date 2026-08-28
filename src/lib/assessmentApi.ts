@@ -41,6 +41,7 @@ export async function analyzeAssessment(input: AnalysisInput): Promise<AnalysisO
         text: input.text,
         language: input.language,
         voice_metadata: input.voiceMetadata,
+        structured_data: input.structuredData,
       }),
     });
     if (!res.ok) throw new Error(`AI service error: ${res.status}`);

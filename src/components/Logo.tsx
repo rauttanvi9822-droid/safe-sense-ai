@@ -13,15 +13,15 @@ export function Logo({ size = 'md', variant = 'dark' }: LogoProps) {
     lg: { icon: 32, text: 'text-2xl', sub: 'text-sm' },
   };
   const s = sizes[size];
-  const textColor = variant === 'light' ? 'text-white' : 'text-[#0f2547]';
-  const mutedColor = variant === 'light' ? 'text-cyan-200' : 'text-cyan-600';
+  const textColor = variant === 'light' ? 'text-white' : 'text-[#123b68]';
+  const mutedColor = variant === 'light' ? 'text-cyan-200' : 'text-[#1689b0]';
 
   return (
     <div className="flex items-center gap-2">
       <div
         className={clsx(
           'flex items-center justify-center rounded-lg',
-          variant === 'light' ? 'bg-white/20' : 'bg-[#0f2547]',
+          variant === 'light' ? 'bg-white/20' : 'bg-[#145da0]',
           size === 'sm' ? 'w-7 h-7' : size === 'md' ? 'w-9 h-9' : 'w-12 h-12'
         )}
       >

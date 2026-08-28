@@ -228,3 +228,17 @@ CREATE INDEX idx_assessments_case_id ON assessments(case_id);
 CREATE INDEX idx_svi_results_risk ON svi_results(risk_category);
 CREATE INDEX idx_audit_logs_user_id ON audit_logs(user_id);
 CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at DESC);
+
+-- ─── Conversation Memory ─────────────────────────────────────────────────────
+-- Stores only short, explicitly stated, low-sensitivity context for continuity.
+CREATE TABLE conversation_memories (
+    id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    kind        TEXT NOT NULL,
+    content     TEXT NOT NULL CHECK (char_length(content) <= 500),
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE conversation_memories ENABLE ROW LEVEL SECURITY;
+CREATE INDEX idx_conversation_memories_user_id ON conversation_memories(user_id);

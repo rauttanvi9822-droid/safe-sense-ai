@@ -41,6 +41,8 @@ export interface SVIResult {
   recommendedSupport: string;
   timestamp: string;
   isPrototype: true;
+  supportRisk?: string;
+  traumaIndicator?: boolean;
 }
 
 export interface ChatMessage {
@@ -123,4 +125,5 @@ export interface OnboardingState {
   language: Language;
   interactionMode: InteractionMode;
   step: 'consent' | 'language' | 'mode' | 'assessment';
+  assessmentType?: 'initial' | 'reassessment';
 }

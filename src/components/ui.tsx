@@ -23,11 +23,11 @@ export function Button({
 
   const variants = {
     primary:
-      'bg-[#0f2547] text-white hover:bg-[#1a3a6b] focus:ring-[#0f2547] active:bg-[#0a1a35]',
+      'bg-[#145da0] text-white hover:bg-[#104d87] focus:ring-[#145da0] active:bg-[#0d416f] shadow-sm shadow-blue-900/10',
     secondary:
-      'bg-cyan-600 text-white hover:bg-cyan-700 focus:ring-cyan-600 active:bg-cyan-800',
+      'bg-[#1689b0] text-white hover:bg-[#117595] focus:ring-[#1689b0] active:bg-[#0d647f]',
     outline:
-      'border border-[#0f2547] text-[#0f2547] bg-white hover:bg-slate-50 focus:ring-[#0f2547]',
+      'border border-[#9fc3dc] text-[#145da0] bg-white hover:bg-[#f0f7fb] focus:ring-[#145da0]',
     ghost:
       'text-[#0f2547] bg-transparent hover:bg-slate-100 focus:ring-[#0f2547]',
     danger:
@@ -67,8 +67,8 @@ export function Card({ children, className, hover = false }: CardProps) {
   return (
     <div
       className={clsx(
-        'bg-white rounded-xl border border-slate-200 shadow-sm',
-        hover && 'hover:shadow-md hover:border-slate-300 transition-shadow duration-200',
+        'bg-white rounded-xl border border-slate-200 shadow-[0_8px_24px_rgba(24,76,116,0.06)]',
+        hover && 'hover:shadow-[0_12px_30px_rgba(24,76,116,0.11)] hover:border-blue-200 transition-shadow duration-200',
         className
       )}
     >
